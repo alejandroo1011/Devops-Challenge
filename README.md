@@ -25,7 +25,3 @@ Challenge 3
 Create a Github workflow to allow installing helm chart from Challenge #1 using
 module from Challenge #2, into an AKS cluster (considering a preexisCng resource
 group and cluster name).
-How do we evaluate the test?
-1. How clear your code is.
-2. How clear your explanaCon is.
-3. Easiness to run the code.
