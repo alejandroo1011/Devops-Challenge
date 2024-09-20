@@ -1,0 +1,46 @@
+#Referencias
+#https://stackoverflow.com/questions/69840694/what-does-ubuntu-latest-mean-for-github-actions
+#https://pitstop.manageengine.com/portal/en/kb/articles/how-to-connect-azure-kubernetes-service-aks-cluster
+#https://stackoverflow.com/questions/67131269/what-is-the-use-of-actions-checkout-in-github-actions
+
+
+#Nombre del Workflow
+name: Deploy Helm Chart
+#Ejecutar cuando este en la rama main, lo podemos cambiar a la rama que queramos
+on:
+  push:
+    branches:
+      - main
+
+#Ejecutamos en un entorno linux
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      #Descargar del repositorio el codigo
+      - name: Descargar code
+        uses: actions/checkout@v2
+      #Configurar Azure, tambien podriamos añadir secretos en los que configuraramos las credenciales y la subscription
+      - name: Configurar AZ
+        run: |
+          az account set --subscription subscripcion
+      #Configurar Kubernetes (AKS)
+      - name: Set up AKS credentials
+        run: |
+          az aks get-credentials --resource-group resourcegroupname --name clustername
+      #Autenticación en el ACR de destino (desde Challenge 2)
+      - name: Login to ACR
+        run: |
+          az acr login --name nombre
+
+      #Copiar Helm Chart desde ACR origen al destino (Challenge 2)
+      - name: Copy Helm Chart
+        run: |
+          helm repo add source-acr https://url.azurecr.io/helm
+          helm pull source-acr/challenge2 --version 1.0.0
+          helm push challenge2-1.0.0.tgz oci://url.azurecr.io/helm
+      #Desplegar el Helm Chart en AKS
+      - name: Install Helm Chart on AKS
+        run: |
+          helm install my-release oci://url.azurecr.io/helm/challenge2 --version 1.0.0
+       
